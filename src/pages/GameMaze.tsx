@@ -29,7 +29,7 @@ export function GameMaze({ level }: GameMazeProps) {
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white">
-            <h1 className="text-4xl font-bold mb-4">Game Maze</h1>
+            <h1 className="text-4xl font-bold" style={{marginTop: 0}}>Game Maze</h1>
             <p className="text-lg mb-6">
                 You are playing Level {mazeLevel.id} with a grid size of {mazeLevel.gridSize}.
             </p>

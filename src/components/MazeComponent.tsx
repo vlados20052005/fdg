@@ -85,6 +85,27 @@ export function MazeComponent({ gridSize, levelId }: MazeComponentProps) {
         }
     };
 
+    // Prevent vertical scrolling caused by arrow keys or swipes
+    useEffect(() => {
+        const preventScroll = (e: KeyboardEvent) => {
+            if (["ArrowUp", "ArrowDown"].includes(e.key)) {
+                e.preventDefault();
+            }
+        };
+
+        const preventTouchScroll = (e: TouchEvent) => {
+            e.preventDefault();
+        };
+
+        window.addEventListener('keydown', preventScroll);
+        window.addEventListener('touchmove', preventTouchScroll, { passive: false });
+
+        return () => {
+            window.removeEventListener('keydown', preventScroll);
+            window.removeEventListener('touchmove', preventTouchScroll);
+        };
+    }, []);
+
     // Arrow key controls
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
@@ -147,31 +168,8 @@ export function MazeComponent({ gridSize, levelId }: MazeComponentProps) {
         return () => window.removeEventListener('touchstart', handleTouchStart);
     }, [player, mazeGrid, gameOver, gameState]);
 
-    // Gyroscope controls
-    useEffect(() => {
-        const handleDeviceOrientation = (event: DeviceOrientationEvent) => {
-            if (!event.gamma || !event.beta) return; // Ensure values exist
-
-            if (event.gamma > 15) {
-                handleMove('right');
-            } else if (event.gamma < -15) {
-                handleMove('left');
-            }
-
-            if (event.beta > 15) {
-                handleMove('down');
-            } else if (event.beta < -15) {
-                handleMove('up');
-            }
-        };
-
-        window.addEventListener('deviceorientation', handleDeviceOrientation);
-        return () => window.removeEventListener('deviceorientation', handleDeviceOrientation);
-    }, [player, mazeGrid, gameOver, gameState]);
-
     return (
         <div style={{ textAlign: 'center' }}>
-            {gameOver && <h2 style={{ color: 'green' }}>You win!</h2>}
             {gameState === 'finished' && <h2 style={{ color: 'blue' }}>Game Over!</h2>}
             <div
                 style={{
@@ -187,7 +185,7 @@ export function MazeComponent({ gridSize, levelId }: MazeComponentProps) {
                     row.map((cell, colIndex) => {
                         const cellStyle = {
                             width: '100%',
-                            paddingBottom: '100%', // Maintain square shape
+                            paddingBottom: '100%',
                             backgroundColor: cell.isWall ? 'black' : 'white',
                             position: 'relative' as const,
                         };
