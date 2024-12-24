@@ -69,6 +69,7 @@ export function MazeComponent({ gridSize, levelId }: MazeComponentProps) {
         break;
     }
 
+
     if (row !== player.row || col !== player.col) {
     playMoveSound();
       setPlayer({ row, col });
@@ -112,6 +113,18 @@ export function MazeComponent({ gridSize, levelId }: MazeComponentProps) {
       }
     }
   };
+
+  useEffect(() => {
+    const preventDefault = (e: Event) => e.preventDefault();
+
+    window.addEventListener("keydown", preventDefault, { passive: false });
+    window.addEventListener("touchmove", preventDefault, { passive: false });
+
+    return () => {
+      window.removeEventListener("keydown", preventDefault);
+      window.removeEventListener("touchmove", preventDefault);
+    };
+  }, []);
 
   // Arrow key controls
   useEffect(() => {

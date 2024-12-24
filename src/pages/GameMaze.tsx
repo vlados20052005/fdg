@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { MazeComponent } from "../components/MazeComponent.tsx";
 
 interface Maze {
@@ -15,7 +15,37 @@ export function GameMaze({ level }: GameMazeProps) {
   const location = useLocation();
   const mazeLevel = level || (location.state as Maze);
 
-  const [gyroEnabled, setGyroEnabled] = useState(false);
+  const [, setGyroEnabled] = useState(false);
+
+  useEffect(() => {
+    const requestGyroPermission = () => {
+      if (
+        typeof DeviceMotionEvent !== "undefined" &&
+        "requestPermission" in DeviceMotionEvent
+      ) {
+        (
+          DeviceMotionEvent as typeof DeviceMotionEvent & {
+            requestPermission?: () => Promise<"granted" | "denied">;
+          }
+        )
+          .requestPermission?.()
+          .then((response) => {
+            if (response === "granted") {
+              setGyroEnabled(true);
+            } else {
+              alert("Gyroscope permission was denied.");
+            }
+          })
+          .catch(() =>
+            alert("Gyroscope permission is not supported on this device.")
+          );
+      } else {
+        setGyroEnabled(true);
+      }
+    };
+
+    requestGyroPermission();
+  }, []);
 
   if (!mazeLevel) {
     return (
@@ -30,33 +60,6 @@ export function GameMaze({ level }: GameMazeProps) {
     );
   }
 
-  const requestGyroPermission = () => {
-    if (
-      typeof DeviceMotionEvent !== "undefined" &&
-      "requestPermission" in DeviceMotionEvent
-    ) {
-      (
-        DeviceMotionEvent as typeof DeviceMotionEvent & {
-          requestPermission?: () => Promise<"granted" | "denied">;
-        }
-      )
-        .requestPermission?.()
-        .then((response) => {
-          if (response === "granted") {
-            setGyroEnabled(true);
-          } else {
-            alert("Gyroscope permission was denied.");
-          }
-        })
-        .catch(() =>
-          alert("Gyroscope permission is not supported on this device.")
-        );
-    } else {
-      setGyroEnabled(true);
-    }
-  };
-
-
   return (
     <div
       className="flex flex-col items-center justify-center bg-gray-900 text-white"
@@ -65,25 +68,6 @@ export function GameMaze({ level }: GameMazeProps) {
         overflow: "hidden", // Remove scrolling
       }}
     >
-      {!gyroEnabled && (
-        <button
-          onClick={requestGyroPermission}
-          style={{
-            position: "absolute",
-            top: "10px",
-            right: "10px",
-            padding: "10px 20px",
-            fontSize: "14px",
-            backgroundColor: "orange",
-            color: "white",
-            border: "none",
-            borderRadius: "8px",
-            cursor: "pointer",
-          }}
-        >
-          Enable Gyroscope and Sound
-        </button>
-      )}
       <h1 className="text-4xl font-bold" style={{ marginTop: 0 }}>
         Game Maze
       </h1>
