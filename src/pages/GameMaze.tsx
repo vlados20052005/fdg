@@ -1,4 +1,4 @@
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useState } from "react";
 import { MazeComponent } from "../components/MazeComponent.tsx";
 
@@ -13,7 +13,6 @@ interface GameMazeProps {
 
 export function GameMaze({ level }: GameMazeProps) {
   const location = useLocation();
-  const navigate = useNavigate();
   const mazeLevel = level || (location.state as Maze);
 
   const [gyroEnabled, setGyroEnabled] = useState(false);
@@ -57,9 +56,6 @@ export function GameMaze({ level }: GameMazeProps) {
     }
   };
 
-  const handleResetLevel = () => {
-    navigate(`/play/${mazeLevel.id}`, { state: mazeLevel });
-  };
 
   return (
     <div
@@ -97,12 +93,6 @@ export function GameMaze({ level }: GameMazeProps) {
       </p>
       <MazeComponent gridSize={mazeLevel.gridSize} levelId={mazeLevel.id} />
       <div className="flex space-x-4 mt-6">
-        <button
-          onClick={handleResetLevel}
-          className="px-6 py-3 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-lg shadow-lg"
-        >
-          Reset Level
-        </button>
         <Link to="/play">
           <button className="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg shadow-lg">
             Back to Levels
