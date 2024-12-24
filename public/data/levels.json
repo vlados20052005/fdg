@@ -1,0 +1,24 @@
+{
+  "mazes": [
+    {
+      "id": 1,
+      "gridSize": 20
+    },
+    {
+      "id": 2,
+      "gridSize": 25
+    },
+    {
+      "id": 3,
+      "gridSize": 30
+    },
+    {
+      "id": 4,
+      "gridSize": 35
+    },
+    {
+      "id": 5,
+      "gridSize": 40
+    }
+  ]
+}
