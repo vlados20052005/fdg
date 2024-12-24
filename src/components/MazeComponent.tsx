@@ -7,7 +7,7 @@ import {
 
 interface MazeComponentProps {
   gridSize: number;
-  levelId: number; // Pass the level ID to link scores
+  levelId: number;
 }
 
 export function MazeComponent({ gridSize, levelId }: MazeComponentProps) {
