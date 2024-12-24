@@ -14,7 +14,7 @@ export function MazeComponent({ gridSize, levelId }: MazeComponentProps) {
     const [gameState, setGameState] = useState<'playing' | 'finished'>('playing');
     const [moves, setMoves] = useState(0);
     const [startTime, setStartTime] = useState<number | null>(null);
-    const [lastGyroMove, setLastGyroMove] = useState<number>(0); // Track the last move time
+    const [lastGyroMove, setLastGyroMove] = useState<number>(0); // Debounce gyroscope inputs
 
     // Initialize the maze
     useEffect(() => {
@@ -86,17 +86,97 @@ export function MazeComponent({ gridSize, levelId }: MazeComponentProps) {
         }
     };
 
+    // Prevent vertical scrolling caused by arrow keys or swipes
+    useEffect(() => {
+        const preventScroll = (e: KeyboardEvent) => {
+            if (["ArrowUp", "ArrowDown"].includes(e.key)) {
+                e.preventDefault();
+            }
+        };
+
+        const preventTouchScroll = (e: TouchEvent) => {
+            e.preventDefault();
+        };
+
+        window.addEventListener('keydown', preventScroll);
+        window.addEventListener('touchmove', preventTouchScroll, { passive: false });
+
+        return () => {
+            window.removeEventListener('keydown', preventScroll);
+            window.removeEventListener('touchmove', preventTouchScroll);
+        };
+    }, []);
+
+    // Arrow key controls
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            switch (e.key) {
+                case 'ArrowUp':
+                    handleMove('up');
+                    break;
+                case 'ArrowDown':
+                    handleMove('down');
+                    break;
+                case 'ArrowLeft':
+                    handleMove('left');
+                    break;
+                case 'ArrowRight':
+                    handleMove('right');
+                    break;
+                default:
+                    break;
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [player, mazeGrid, gameOver, gameState]);
+
+    // Touch controls (swipes)
+    useEffect(() => {
+        const handleTouchStart = (e: TouchEvent) => {
+            const touchStartX = e.touches[0].clientX;
+            const touchStartY = e.touches[0].clientY;
+
+            const handleTouchMove = (e: TouchEvent) => {
+                const touchEndX = e.changedTouches[0].clientX;
+                const touchEndY = e.changedTouches[0].clientY;
+
+                const dx = touchEndX - touchStartX;
+                const dy = touchEndY - touchStartY;
+
+                if (Math.abs(dx) > Math.abs(dy)) {
+                    if (dx > 0) {
+                        handleMove('right');
+                    } else {
+                        handleMove('left');
+                    }
+                } else {
+                    if (dy > 0) {
+                        handleMove('down');
+                    } else {
+                        handleMove('up');
+                    }
+                }
+
+                window.removeEventListener('touchmove', handleTouchMove);
+            };
+
+            window.addEventListener('touchmove', handleTouchMove);
+        };
+
+        window.addEventListener('touchstart', handleTouchStart);
+        return () => window.removeEventListener('touchstart', handleTouchStart);
+    }, [player, mazeGrid, gameOver, gameState]);
+
     // Gyroscope controls
     useEffect(() => {
         const handleDeviceOrientation = (event: DeviceOrientationEvent) => {
-            if (!event.gamma || !event.beta) return; // Ensure values exist
-
             const now = Date.now();
-            const tiltThreshold = 15; // Minimum tilt angle to trigger a move
-            const debounceTime = 300; // Minimum time (ms) between moves
+            const debounceTime = 300; // Prevents overly frequent movements
+            const tiltThreshold = 15; // Minimum tilt angle to trigger a movement
 
-            // Ensure a delay between movements
-            if (now - lastGyroMove < debounceTime) return;
+            if (!event.gamma || !event.beta || now - lastGyroMove < debounceTime) return;
 
             if (event.gamma > tiltThreshold) {
                 handleMove('right');
