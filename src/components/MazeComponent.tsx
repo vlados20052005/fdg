@@ -14,7 +14,8 @@ export function MazeComponent({ gridSize, levelId }: MazeComponentProps) {
     const [gameState, setGameState] = useState<'playing' | 'finished'>('playing');
     const [moves, setMoves] = useState(0);
     const [startTime, setStartTime] = useState<number | null>(null);
-    const [lastGyroMove, setLastGyroMove] = useState<number>(0); // Debounce gyroscope inputs
+    const [lastGyroMove, setLastGyroMove] = useState<number>(0);
+    const [gyroEnabled, setGyroEnabled] = useState(false);
 
     // Initialize the maze
     useEffect(() => {
@@ -86,27 +87,6 @@ export function MazeComponent({ gridSize, levelId }: MazeComponentProps) {
         }
     };
 
-    // Prevent vertical scrolling caused by arrow keys or swipes
-    useEffect(() => {
-        const preventScroll = (e: KeyboardEvent) => {
-            if (["ArrowUp", "ArrowDown"].includes(e.key)) {
-                e.preventDefault();
-            }
-        };
-
-        const preventTouchScroll = (e: TouchEvent) => {
-            e.preventDefault();
-        };
-
-        window.addEventListener('keydown', preventScroll);
-        window.addEventListener('touchmove', preventTouchScroll, { passive: false });
-
-        return () => {
-            window.removeEventListener('keydown', preventScroll);
-            window.removeEventListener('touchmove', preventTouchScroll);
-        };
-    }, []);
-
     // Arrow key controls
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
@@ -129,52 +109,75 @@ export function MazeComponent({ gridSize, levelId }: MazeComponentProps) {
         };
 
         window.addEventListener('keydown', handleKeyDown);
-        return () => window.removeEventListener('keydown', handleKeyDown);
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+        };
     }, [player, mazeGrid, gameOver, gameState]);
 
-    // Touch controls (swipes)
+    // Swipe controls
     useEffect(() => {
+        let touchStartX = 0;
+        let touchStartY = 0;
+
         const handleTouchStart = (e: TouchEvent) => {
-            const touchStartX = e.touches[0].clientX;
-            const touchStartY = e.touches[0].clientY;
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+        };
 
-            const handleTouchMove = (e: TouchEvent) => {
-                const touchEndX = e.changedTouches[0].clientX;
-                const touchEndY = e.changedTouches[0].clientY;
+        const handleTouchEnd = (e: TouchEvent) => {
+            const touchEndX = e.changedTouches[0].clientX;
+            const touchEndY = e.changedTouches[0].clientY;
 
-                const dx = touchEndX - touchStartX;
-                const dy = touchEndY - touchStartY;
+            const dx = touchEndX - touchStartX;
+            const dy = touchEndY - touchStartY;
 
-                if (Math.abs(dx) > Math.abs(dy)) {
-                    if (dx > 0) {
-                        handleMove('right');
-                    } else {
-                        handleMove('left');
-                    }
+            if (Math.abs(dx) > Math.abs(dy)) {
+                if (dx > 0) {
+                    handleMove('right');
                 } else {
-                    if (dy > 0) {
-                        handleMove('down');
-                    } else {
-                        handleMove('up');
-                    }
+                    handleMove('left');
                 }
-
-                window.removeEventListener('touchmove', handleTouchMove);
-            };
-
-            window.addEventListener('touchmove', handleTouchMove);
+            } else {
+                if (dy > 0) {
+                    handleMove('down');
+                } else {
+                    handleMove('up');
+                }
+            }
         };
 
         window.addEventListener('touchstart', handleTouchStart);
-        return () => window.removeEventListener('touchstart', handleTouchStart);
+        window.addEventListener('touchend', handleTouchEnd);
+
+        return () => {
+            window.removeEventListener('touchstart', handleTouchStart);
+            window.removeEventListener('touchend', handleTouchEnd);
+        };
     }, [player, mazeGrid, gameOver, gameState]);
 
     // Gyroscope controls
+    const requestGyroPermission = () => {
+        if (typeof DeviceMotionEvent !== "undefined" && "requestPermission" in DeviceMotionEvent) {
+            (DeviceMotionEvent as typeof DeviceMotionEvent & { requestPermission?: () => Promise<"granted" | "denied"> })
+                .requestPermission?.()
+                .then((response) => {
+                    if (response === "granted") {
+                        setGyroEnabled(true);
+                    } else {
+                        alert("Gyroscope permission was denied.");
+                    }
+                })
+                .catch(() => alert("Gyroscope permission is not supported on this device."));
+        } else {
+            setGyroEnabled(true);
+        }
+    };
+
     useEffect(() => {
         const handleDeviceOrientation = (event: DeviceOrientationEvent) => {
             const now = Date.now();
-            const debounceTime = 300; // Prevents overly frequent movements
-            const tiltThreshold = 15; // Minimum tilt angle to trigger a movement
+            const debounceTime = 300;
+            const tiltThreshold = 15;
 
             if (!event.gamma || !event.beta || now - lastGyroMove < debounceTime) return;
 
@@ -195,9 +198,14 @@ export function MazeComponent({ gridSize, levelId }: MazeComponentProps) {
             }
         };
 
-        window.addEventListener('deviceorientation', handleDeviceOrientation);
-        return () => window.removeEventListener('deviceorientation', handleDeviceOrientation);
-    }, [player, mazeGrid, gameOver, gameState, lastGyroMove]);
+        if (gyroEnabled) {
+            window.addEventListener('deviceorientation', handleDeviceOrientation);
+        }
+
+        return () => {
+            window.removeEventListener('deviceorientation', handleDeviceOrientation);
+        };
+    }, [player, mazeGrid, gameOver, gameState, lastGyroMove, gyroEnabled]);
 
     return (
         <div style={{ textAlign: 'center' }}>
@@ -234,6 +242,14 @@ export function MazeComponent({ gridSize, levelId }: MazeComponentProps) {
                 )}
             </div>
             <p>Moves: {moves}</p>
+            {!gyroEnabled && (
+                <button
+                    onClick={requestGyroPermission}
+                    style={{ marginTop: '20px', padding: '10px 20px', fontSize: '16px' }}
+                >
+                    Enable Gyroscope
+                </button>
+            )}
             <p>Use arrow keys, swipe, or tilt your device to move the player (blue) to the finish (green).</p>
         </div>
     );
