@@ -168,6 +168,30 @@ export function MazeComponent({ gridSize, levelId }: MazeComponentProps) {
         return () => window.removeEventListener('touchstart', handleTouchStart);
     }, [player, mazeGrid, gameOver, gameState]);
 
+    // Gyroscope controls
+    useEffect(() => {
+        const handleDeviceOrientation = (event: DeviceOrientationEvent) => {
+            if (!event.gamma || !event.beta) return; // Ensure values exist
+
+            // Use gamma for horizontal tilt
+            if (event.gamma > 15) {
+                handleMove('right');
+            } else if (event.gamma < -15) {
+                handleMove('left');
+            }
+
+            // Use beta for vertical tilt
+            if (event.beta > 15) {
+                handleMove('down');
+            } else if (event.beta < -15) {
+                handleMove('up');
+            }
+        };
+
+        window.addEventListener('deviceorientation', handleDeviceOrientation);
+        return () => window.removeEventListener('deviceorientation', handleDeviceOrientation);
+    }, [player, mazeGrid, gameOver, gameState]);
+
     return (
         <div style={{ textAlign: 'center' }}>
             {gameState === 'finished' && <h2 style={{ color: 'blue' }}>Game Over!</h2>}
