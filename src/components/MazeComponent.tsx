@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { backtrackingMazeGeneration, Cell, initializeMaze } from "../services/maze.ts";
 
 interface MazeComponentProps {
