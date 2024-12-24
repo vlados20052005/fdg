@@ -6,12 +6,12 @@ export function GameMenu() {
             <h1 className="text-5xl font-bold mb-8">Maze Game Menu</h1>
             <div className="space-y-4">
                 <Link to="/play">
-                    <button className="px-6 py-3 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-lg shadow-lg">
+                    <button className="px-6 py-3 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-lg shadow-lg " style={{marginRight: "4px"}}>
                         Start Game
                     </button>
                 </Link>
                 <Link to="/high-scores">
-                    <button className="px-6 py-3 bg-purple-500 hover:bg-purple-600 text-white font-semibold rounded-lg shadow-lg min-h-max">
+                    <button className="px-6 py-3 bg-purple-500 hover:bg-purple-600 text-white font-semibold rounded-lg shadow-lg min-h-max" style={{marginLeft: "4px"}}>
                         View High Scores
                     </button>
                 </Link>

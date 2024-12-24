@@ -89,7 +89,7 @@ export function HighScores() {
             {loading && <p className="text-lg mb-6">Loading...</p>}
             {!loading && levels.length > 0 && (
                 <div className="mb-6">
-                    <label htmlFor="level-select" className="text-lg mb-2 block">Select Level:</label>
+                    <label htmlFor="level-select" className="text-lg mb-2 block">Select Level: </label>
                     <select
                         id="level-select"
                         className="px-4 py-2 bg-gray-800 text-white rounded-lg"
@@ -116,7 +116,7 @@ export function HighScores() {
                 <p className="text-lg mb-6">No high scores available for this level yet.</p>
             )}
             <Link to="/">
-                <button className="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg shadow-lg">
+                <button className="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg shadow-lg" style={{marginTop: "10px"}}>
                     Back to Menu
                 </button>
             </Link>
