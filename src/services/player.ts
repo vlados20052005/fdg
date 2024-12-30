@@ -24,4 +24,4 @@ export function updateProgress(player: Player, progress: number): Player {
         ...player,
         userProgress: progress
     };
-}
+}        

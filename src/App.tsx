@@ -5,6 +5,7 @@ import {SelectLevel} from "./pages/SelectLevel.tsx";
 import {GameMaze} from "./pages/GameMaze.tsx";
 import { HighScores } from './pages/Scores.tsx';
 
+
 function App() {
 
   return (

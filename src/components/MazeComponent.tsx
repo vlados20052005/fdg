@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   backtrackingMazeGeneration,
   Cell,
@@ -8,9 +9,10 @@ import {
 interface MazeComponentProps {
   gridSize: number;
   levelId: number;
+  levels: { id: number; gridSize: number; difficulty: string }[];
 }
 
-export function MazeComponent({ gridSize, levelId }: MazeComponentProps) {
+function MazeComponent({ gridSize, levelId, levels }: MazeComponentProps) {
   const [mazeGrid, setMazeGrid] = useState<Cell[][]>([]);
   const [player, setPlayer] = useState({ row: 1, col: 1 });
   const [finish, setFinish] = useState({
@@ -23,6 +25,7 @@ export function MazeComponent({ gridSize, levelId }: MazeComponentProps) {
   const [startTime, setStartTime] = useState<number | null>(null);
   const [lastGyroMove, setLastGyroMove] = useState<number>(0);
   const [gyroEnabled, setGyroEnabled] = useState(false);
+  const navigate = useNavigate();
 
   // Initialize the maze
   useEffect(() => {
@@ -113,6 +116,15 @@ export function MazeComponent({ gridSize, levelId }: MazeComponentProps) {
       }
     }
   };
+
+  const handleNextLevel = () => {
+    const currentIndex = levels.findIndex((level) => level.id === levelId);
+    const nextLevel = levels[currentIndex + 1];
+    if (nextLevel) {
+      navigate(`/play/${nextLevel.id}`, { state: { ...nextLevel, levels } });
+    }
+  };
+
 
   useEffect(() => {
     const preventDefault = (e: Event) => e.preventDefault();
@@ -256,12 +268,40 @@ export function MazeComponent({ gridSize, levelId }: MazeComponentProps) {
     };
   }, [player, mazeGrid, gameOver, gameState, lastGyroMove, gyroEnabled]);
 
+  useEffect(() => {
+    const gameContainer = document.getElementById("maze-container");
+
+    const preventScroll = (e: TouchEvent) => {
+      if (gameContainer && gameContainer.contains(e.target as Node)) {
+        e.preventDefault();
+      }
+    };
+
+    gameContainer?.addEventListener("touchmove", preventScroll, {
+      passive: false,
+    });
+
+    return () => {
+      gameContainer?.removeEventListener("touchmove", preventScroll);
+    };
+  }, []);
+  
   return (
     <div style={{ textAlign: "center" }}>
       {gameState === "finished" && (
+        <div>
         <h2 style={{ color: "blue" }}>Game Over!</h2>
+        <button
+          onClick={handleNextLevel}
+          className="px-6 py-3 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-lg shadow-lg"
+          style={{marginBottom: "5px"}}
+        >
+          Next Level
+        </button>
+      </div>
       )}
       <div
+      id="maze-container"
         style={{
           display: "grid",
           gridTemplateColumns: `repeat(${gridSize}, 1fr)`,
@@ -310,3 +350,5 @@ export function MazeComponent({ gridSize, levelId }: MazeComponentProps) {
     </div>
   );
 }
+
+export default MazeComponent;

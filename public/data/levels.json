@@ -2,23 +2,75 @@
   "mazes": [
     {
       "id": 1,
-      "gridSize": 20
+      "gridSize": 15,
+      "difficulty": "easy",
+      "hint": "Start by moving toward the bottom-left corner. Avoid walls along the edge."
     },
     {
       "id": 2,
-      "gridSize": 25
+      "gridSize": 21,
+      "difficulty": "easy",
+      "hint": "Stick to the open paths. The exit is closer to the bottom-right."
     },
     {
       "id": 3,
-      "gridSize": 30
+      "gridSize": 25,
+      "difficulty": "easy",
+      "hint": "Look for pathways along the center of the grid. Shortcuts may be visible."
     },
     {
       "id": 4,
-      "gridSize": 35
+      "gridSize": 35,
+      "difficulty": "medium",
+      "hint": "The maze becomes trickier. Focus on avoiding loops in the paths."
     },
     {
       "id": 5,
-      "gridSize": 40
+      "gridSize": 45,
+      "difficulty": "medium",
+      "hint": "Dead ends are frequent. Observe patterns to find an open route."
+    },
+    {
+      "id": 6,
+      "gridSize": 55,
+      "difficulty": "medium",
+      "hint": "The finish is far. Work systematically from edge to edge."
+    },
+    {
+      "id": 7,
+      "gridSize": 65,
+      "difficulty": "hard",
+      "hint": "Paths twist more often. Keep track of the direction you came from."
+    },
+    {
+      "id": 8,
+      "gridSize": 65,
+      "difficulty": "hard",
+      "hint": "Plan your moves ahead. Use walls as guides for orientation."
+    },
+    {
+      "id": 9,
+      "gridSize": 65,
+      "difficulty": "hard",
+      "hint": "The middle area has fewer walls. Explore thoroughly."
+    },
+    {
+      "id": 10,
+      "gridSize": 75,
+      "difficulty": "expert",
+      "hint": "Complex paths require patience. Follow the most open routes first."
+    },
+    {
+      "id": 11,
+      "gridSize": 85,
+      "difficulty": "expert",
+      "hint": "Pay attention to narrow corridors. Small openings may lead to shortcuts."
+    },
+    {
+      "id": 12,
+      "gridSize": 95,
+      "difficulty": "expert",
+      "hint": "The largest maze. Work your way step by step and focus on reachable exits."
     }
   ]
 }

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 export function GameMenu() {
     return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-gray-800 text-white">
-            <h1 className="text-5xl font-bold mb-8">Maze Game Menu</h1>
+            <h1 className="text-5xl font-bold mb-8">Lost & Found</h1>
             <div className="space-y-4">
                 <Link to="/play">
                     <button className="px-6 py-3 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-lg shadow-lg " style={{marginRight: "4px"}}>
